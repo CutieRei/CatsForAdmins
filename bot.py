@@ -161,7 +161,7 @@ async def on_command_error(ctx,error):
     if isinstance(error,commands.MissingRole):
     	await ctx.send(f"You are missing **{error.missing_role}** role meow!")
     elif isinstance(error,commands.MissingAnyRole):
-    	await ctx.send(f"You are missing **{','.join(error.missing_roles)}** meow!")
+    	await ctx.send(f"You are missing **{','.join(error.missing_roles)}** roles meow!")
     elif isinstance(error, commands.CheckFailure):
     	await ctx.send(f"🚫You cannot use command on this channel!🚫")
     else:
