@@ -37,6 +37,8 @@ def custom_check(ctx):
 
 @bot.event
 async def on_member_join(member):
+	db = sqlite3.connect("data.db")
+	cursor = db.cursor()
 	welcomes = random.choice([f"Hello {member.mention}, have fun here👋",f"Welcome {member.mention}, we hope you have fun here😄",f"Hello, friend {member.mention} have fun while in here😊"])
 	card = discord.Embed(
 	colour=discord.Colour.from_rgb(random.randint(0,255),random.randint(0,255),random.randint(0,255)),
@@ -45,37 +47,51 @@ async def on_member_join(member):
 	)
 	card.set_thumbnail(url=member.avatar_url_as(static_format='png'))
 	channel = bot.get_channel(723841454778351668)
+	cursor.execute("""
+		INSERT INTO info VALUES (?,?,?)
+	""",(member.id,member.name,0,))
+	db.commit()
+	db.close()
 	await channel.send(embed=card)
 
 @bot.command()
-async def verify(ctx):
-	db = sqlite3.connect('data.db')
+async def verify(ctx,member:discord.Member=None):
+	db = sqlite3.connect("data.db")
 	cursor = db.cursor()
-	card = discord.Embed(
-	colour=discord.Colour.from_rgb(20,255,20),
-	title="Success!",
-	description="You are verified!"
-	)
-	card.set_author(name=ctx.author.name,icon_url=ctx.author.avatar_url_as(static_format='png'))
-	cursor.execute("SELECT * FROM info WHERE name=?",(ctx.author.name,))
-	db.commit()
-	row = cursor.fetchone()
-	db.commit()
-	if row:
-		card.colour = discord.Colour.from_rgb(255,20,20)
-		card.title="Failed!"
-		card.description="You already verified!"
-		await ctx.send(embed=card)
-		db.close()
-	else:
-		
-		cursor.execute("""INSERT INTO info VALUES (?,?,?)
-		 """,(ctx.author.id,ctx.author.name,0,))
-		 
-		await ctx.send(embed=card)
-		 
+	if member and "Mod" in [i.name for i in ctx.author.roles]:
+		cursor.execute("""
+		SELECT * FROM info WHERE id = ?
+		""",(member.id,))
 		db.commit()
-		db.close()
+		user = cursor.fetchone()
+		if user:
+			await ctx.send("That member is verified!")
+		else:
+			cursor.execute("""
+			INSERT INTO info VALUES(?,?,?)
+			""",(member.id,member.name,0,))
+			db.commit()
+			db.close()
+			await ctx.send(f"> Verified {member.name}!")
+			db.close()
+	else:
+		cursor.execute("""
+		SELECT * FROM info WHERE id = ?
+		""",(ctx.author.id,))
+		db.commit()
+		user = cursor.fetchone()
+		if user:
+			await ctx.send("You already verified!")
+		else:
+			cursor.execute("""
+			INSERT INTO info VALUES(?,?,?)
+			""",(ctx.author.id,ctx.author.name,0,))
+			db.commit()
+			db.close()
+			await ctx.send(f"> {ctx.author.name} you are verified!")
+			db.close()
+		
+		
 
 
 @bot.command()
@@ -104,7 +120,7 @@ async def clear(ctx,msg:int):
 async def ban(ctx,member:discord.Member,reason=None):
 	if reason == None:
 		reason = "Undefined"
-	await member.ban(reason=reason)
+	await member.ban(reason=reason,delete_message_days=0)
 	card = discord.Embed(
 	colour=ctx.author.color,
 	title=f"Haha now go meow!",
@@ -139,5 +155,16 @@ async def strike(ctx,member:discord.Member,strike=1):
     	title=f"{member.name} has been given {strike} strikes by {ctx.author.name}"
     	)
     	await ctx.send(embed=card)
+    	
+@bot.event
+async def on_command_error(ctx,error):
+    if isinstance(error,commands.MissingRole):
+    	await ctx.send(f"You are missing **{error.missing_role}** role meow!")
+    elif isinstance(error,commands.MissingAnyRole):
+    	await ctx.send(f"You are missing **{','.join(error.missing_roles)}** meow!")
+    elif isinstance(error, commands.CheckFailure):
+    	await ctx.send(f"🚫You cannot use command on this channel!🚫")
+    else:
+    	raise error
     
 bot.run(TOKEN)
