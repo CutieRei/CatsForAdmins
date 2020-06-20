@@ -24,10 +24,20 @@ async def on_ready():
 	""")
 	
 	db.commit()
+	
+@bot.check
+def custom_check(ctx):
+	if "Mod" in [i.name for i in ctx.author.roles] and ctx.channel.name not in ["bot-1","bot-2"]:
+		return True
+	elif "Mod" not in [i.name for i in ctx.author.roles] and ctx.channel.name not in ["bot-1","bot-2"]:
+		return False
+	else:
+		return True
+		
 
 @bot.event
 async def on_member_join(member):
-	welcomes = random.choice([f"{member.mention} Hello have fun here👋",f"Welcome {member.mention} we hope you have fun here😄",f"Hello friend {member.mention} have fun while in here😊"])
+	welcomes = random.choice([f"Hello {member.mention}, have fun here👋",f"Welcome {member.mention}, we hope you have fun here😄",f"Hello, friend {member.mention} have fun while in here😊"])
 	card = discord.Embed(
 	colour=discord.Colour.from_rgb(random.randint(0,255),random.randint(0,255),random.randint(0,255)),
 	title=f"Welcome {member.name}",
