@@ -1,7 +1,7 @@
 import discord
 from discord.ext import commands
 import sqlite3
-import os
+import os,random
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -24,6 +24,18 @@ async def on_ready():
 	""")
 	
 	db.commit()
+
+@bot.event
+async def on_member_join(member):
+	welcomes = random.choice([f"{member.mention} Hello have fun here👋",f"Welcome {member.mention} we hope you have fun here😄",f"Hello friend {member.mention} have fun while in here😊"])
+	card = discord.Embed(
+	colour=discord.Colour.from_rgb(random.randint(0,255),random.randint(0,255),random.randint(0,255)),
+	title=f"Welcome {member.name}",
+	description=welcomes
+	)
+	card.set_thumbnail(url=member.avatar_url_as(static_format='png'))
+	channel = bot.get_channel(723841454778351668)
+	await channel.send(embed=card)
 
 @bot.command()
 async def verify(ctx):
