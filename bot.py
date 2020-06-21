@@ -9,6 +9,11 @@ TOKEN = os.getenv('TOKEN')
 
 bot = commands.Bot(command_prefix=["!","?"])
 
+initial_extension = ["event"]
+
+for extension in initial_extension:
+	bot.load_extension(extension)
+
 @bot.event
 async def on_ready():
 	print(f"{bot.user.name} has joined!")
@@ -33,26 +38,6 @@ def custom_check(ctx):
 		return False
 	else:
 		return True
-		
-
-@bot.event
-async def on_member_join(member):
-	db = sqlite3.connect("data.db")
-	cursor = db.cursor()
-	welcomes = random.choice([f"Hello {member.mention}, have fun here👋",f"Welcome {member.mention}, we hope you have fun here😄",f"Hello, friend {member.mention} have fun while in here😊"])
-	card = discord.Embed(
-	colour=discord.Colour.from_rgb(random.randint(0,255),random.randint(0,255),random.randint(0,255)),
-	title=f"Welcome {member.name}",
-	description=welcomes
-	)
-	card.set_thumbnail(url=member.avatar_url_as(static_format='png'))
-	channel = bot.get_channel(723841454778351668)
-	cursor.execute("""
-		INSERT INTO info VALUES (?,?,?)
-	""",(member.id,member.name,0,))
-	db.commit()
-	db.close()
-	await channel.send(embed=card)
 
 @bot.command()
 async def verify(ctx,member:discord.Member=None):
@@ -159,9 +144,9 @@ async def strike(ctx,member:discord.Member,strike=1):
 @bot.event
 async def on_command_error(ctx,error):
     if isinstance(error,commands.MissingRole):
-    	await ctx.send(f"You are missing **{error.missing_role}** role meow!")
+    	await ctx.send(f"You are missing **{error.missing_role}** role meow!😼")
     elif isinstance(error,commands.MissingAnyRole):
-    	await ctx.send(f"You are missing **{','.join(error.missing_roles)}** roles meow!")
+    	await ctx.send(f"You are missing **{' , '.join(error.missing_roles)}** roles meow!😼")
     elif isinstance(error, commands.CheckFailure):
     	await ctx.send(f"🚫You cannot use command on this channel!🚫")
     else:
