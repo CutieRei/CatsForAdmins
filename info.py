@@ -10,7 +10,7 @@ class Balance(commands.Cog):
 	async def verify(self,ctx,member:discord.Member=None):
 		db = sqlite3.connect("data.db")
 		cursor = db.cursor()
-		if member and "Mod" in [i.name for i in ctx.author.roles]:
+		if member and "Mod" in [i.name for i in ctx.author.roles] or 716503311402008577 == ctx.author.id:
 			cursor.execute("""
 			SELECT * FROM info WHERE id = ?
 			""",(member.id,))

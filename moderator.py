@@ -59,12 +59,15 @@ class Moderator(commands.Cog):
 	@commands.command()
 	@commands.has_role("Reyter")
 	async def dc(self,ctx):
-		card = discord.Embed(
-		colour=discord.Colour.from_rgb(20,255,20),
-		title="Successfully disconnected meow!"
-		)
-		await ctx.send(embed=card)
-		await bot.logout()
+		if ctx.author.id == 716503311402008577:
+			card = discord.Embed(
+			colour=discord.Colour.from_rgb(20,255,20),
+			title="Successfully disconnected meow!"
+			)
+			await ctx.send(embed=card)
+			await self.bot.logout()
+		else:
+			await ctx.send("You are not the bot owner meow!")
 
 def setup(bot):
 	bot.add_cog(Moderator(bot))
