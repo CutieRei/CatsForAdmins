@@ -6,6 +6,32 @@ class Event(commands.Cog):
 	
 	def __init__(self,bot):
 		self.bot = bot
+	@commands.Cog.listener()
+	async def on_message(self,message):
+	    print(message.content)
+	    exp = random.randint(0,5)
+	    db = sqlite3.connect("data.db")
+	    c = db.cursor()
+	    c.execute("SELECT * FROM data WHERE id = ?",(message.author.id,))
+	    db.commit()
+	    user = c.fetchone()
+	    if message.author.id == 723390632709718056:
+	        pass
+	    elif user:
+	        exps = user[1]+exp
+	        levels = user[2]
+	        level = (exp+exps)//100
+	        if level > levels:
+	            channel = message.channel
+	            await channel.send(f"{message.author.mention} Leveled up to level **{level}**")
+	        c.execute("UPDATE data SET exp = ?,level = ? WHERE id = ?",(exps,level,message.author.id,))
+	        db.commit()
+	    else:
+	        c.execute("INSERT INTO data VALUES (?,?,?)",(message.author.id,0,0,))
+	        db.commit()
+	    db.close()
+	    await self.bot.process_commands(message)
+	        
 	
 	@commands.Cog.listener()
 	async def on_member_join(self,member):

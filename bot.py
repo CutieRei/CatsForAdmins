@@ -28,8 +28,11 @@ async def on_ready():
         strike INTEGER
 	)
 	""")
-	
 	db.commit()
+	cursor.execute("CREATE TABLE IF NOT EXISTS data(id INTEGER,exp INTEGER,level INTEGER)")
+	db.commit()
+	
+	db.close()
 
 @bot.check
 def custom_check(ctx):
