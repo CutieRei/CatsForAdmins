@@ -30,10 +30,10 @@ async def on_ready():
 	""")
 	
 	db.commit()
-	
+
 @bot.check
 def custom_check(ctx):
-	if "Mod" in [i.name for i in ctx.author.roles] and ctx.channel.name not in ["bot-1","bot-2"]:
+	if "Mod" in [i.name for i in ctx.author.roles] or "Reyter" in [i.name for i in ctx.author.roles] and ctx.channel.name not in ["bot-1","bot-2"]:
 		return True
 	elif "Mod" not in [i.name for i in ctx.author.roles] and ctx.channel.name not in ["bot-1","bot-2"]:
 		return False

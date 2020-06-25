@@ -42,7 +42,20 @@ class Balance(commands.Cog):
 				db.close()
 				await ctx.send(f"> {ctx.author.name} you are verified!")
 				db.close()
-
+				
+	@commands.command()
+	@commands.has_any_role("Mod","Reyter")
+	async def check(self,ctx, member: discord.Member):
+	       db = sqlite3.connect("data.db")
+	       c = db.cursor()
+	       c.execute("SELECT * FROM info WHERE id = ?",(member.id,))
+	       user = c.fetchone()
+	       if user:
+	          await ctx.send(f"==Info==\nID: {user[0]}\nName: {user[1]}\nStrikes: {user[2]}")
+	       else:
+	          await ctx.send("Member not found!")
+	       db.close()
+    
 
 def setup(bot):
 	bot.add_cog(Balance(bot))
